@@ -11,7 +11,22 @@ const form = ref({
 })
 
 const isPasswordVisible = ref(false)
-</script>
+const error = ref('')
+
+const login = async () => {
+  try {
+    const response = await axios.post('http://0.0.0.0:8000/users/login-service/', {
+      email: form.value.email,
+      password: form.value.password
+    })
+    // Exemplo: salvar token ou redirecionar
+    console.log(response.data)
+    // $router.push('/') se login for bem-sucedido
+  } catch (err) {
+    error.value = 'Login falhou'
+    console.error(err)
+  }
+}</script>
 
 <template>
   <div class="auth-wrapper d-flex align-center justify-center pa-4">
@@ -60,7 +75,7 @@ const isPasswordVisible = ref(false)
         </VCardText>
 
         <VCardText>
-          <VForm @submit.prevent="$router.push('/')">
+<VForm @submit.prevent="login">
             <VRow>
               <!-- email -->
               <VCol cols="12">
