@@ -12,3 +12,9 @@ export const recoverPassword = async (email) => {
   const { data } = await axios.post(`${API_BASE_URL}/users/recover_password-service/`, { email })
   return data
 }
+
+
+export const register = async (username, email, password) => {
+  const res = await axios.post(`${API_BASE_URL}/users/signup-service/`, { username, email, password })
+  return res.data
+}
