@@ -1,8 +1,10 @@
 <script setup>
 import AuthProvider from '@/views/pages/authentication/AuthProvider.vue'
+import { ref } from 'vue'
 import logo from '@images/logo.svg?raw'
 import authV1BottomShape from '@images/svg/auth-v1-bottom-shape.svg?url'
 import authV1TopShape from '@images/svg/auth-v1-top-shape.svg?url'
+import axios from "axios";
 
 const form = ref({
   email: '',
@@ -11,11 +13,14 @@ const form = ref({
 })
 
 const isPasswordVisible = ref(false)
+
+const error = ref('')
+
 const login = async () => {
   try {
     const response = await axios.post('http://0.0.0.0:8000/users/login-service/', {
-      email: email.value,
-      password: password.value
+      email: form.value.email,
+      password: form.value.password
     })
     console.log(response.data)
     // Aqui você pode salvar o token ou redirecionar o usuário
