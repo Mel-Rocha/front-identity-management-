@@ -3,6 +3,7 @@ import AuthProvider from '@/views/pages/authentication/AuthProvider.vue'
 import logo from '@images/logo.svg?raw'
 import authV1BottomShape from '@images/svg/auth-v1-bottom-shape.svg?url'
 import authV1TopShape from '@images/svg/auth-v1-top-shape.svg?url'
+import axios from "axios";
 
 const form = ref({
   username: '',
@@ -12,6 +13,28 @@ const form = ref({
 })
 
 const isPasswordVisible = ref(false)
+const error = ref('')
+
+const register = async () => {
+  try {
+    const response = await axios.post('http://0.0.0.0:8000/users/signup-service/', {
+      username: form.value.username,
+      email: form.value.email,
+      password: form.value.password,
+    })
+    // Sucesso: redirecione ou mostre mensagem
+    console.log(response.data)
+    error.value = ''
+  } catch (err) {
+    if (err.response && err.response.data && err.response.data.message) {
+      error.value = err.response.data.message
+    } else {
+      error.value = 'Falha no registro'
+    }
+    console.error(err)
+  }
+}
+
 </script>
 
 <template>
@@ -61,7 +84,7 @@ const isPasswordVisible = ref(false)
         </VCardText>
 
         <VCardText>
-          <VForm @submit.prevent="$router.push('/')">
+<VForm @submit.prevent="register">
             <VRow>
               <!-- Username -->
               <VCol cols="12">
