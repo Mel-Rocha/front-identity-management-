@@ -22,18 +22,18 @@ axiosInstance.interceptors.request.use(config => {
 
 // Funções
 export async function login(email, password) {
-  const { data } = await axiosInstance.post('/users/login-service/', { email, password });
-  if (data?.token) setToken(data.token); // armazena o token
+  const { data } = await axios.post(`${API_BASE_URL}/users/login-service/`, { email, password });
+  if (data?.token) setToken(data.token);
   return data;
 }
 
 export async function recoverPassword(email) {
-  const { data } = await axiosInstance.post('/users/recover_password-service/', { email });
+  const { data } = await axios.post(`${API_BASE_URL}/users/recover_password-service/`, { email });
   return data;
 }
 
 export async function register(username, email, password) {
-  const { data } = await axiosInstance.post('/users/signup-service/', { username, email, password });
+  const { data } = await axios.post(`${API_BASE_URL}/users/signup-service/`, { username, email, password });
   return data;
 }
 
