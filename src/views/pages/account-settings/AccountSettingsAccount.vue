@@ -259,8 +259,6 @@ const auth = useAuthStore();
 >
   Listar usuários
 </VBtn>
-          <VCheckbox v-model="isAccountDeactivated" label="I confirm my account deactivation"/>
-          <VBtn :disabled="!isAccountDeactivated" color="error" class="mt-3">Deactivate Account</VBtn>
         </VCardText>
       </VCard>
     </VCol>
