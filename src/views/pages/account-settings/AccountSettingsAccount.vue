@@ -3,10 +3,16 @@ import { ref, onMounted } from 'vue'
 import avatar1 from '@images/avatars/avatar-1.png'
 import { fetchMe } from '@/services/userService'
 import { updateUser } from '@/services/userService'
+import { fetchChoices } from '@/services/choicesService'
 
 const refInputEl = ref()
 const error = ref('')
 const isAccountDeactivated = ref(false)
+
+const currencies = ref([])
+const languages = ref([])
+const timezones = ref([])
+const countries = ref([])
 
 const accountDataLocal = ref({
   avatarImg: avatar1,
@@ -24,14 +30,6 @@ const accountDataLocal = ref({
   currency: ''
 })
 
-// constantes para selects
-const timezones = [
-  'UTC-11', 'UTC-10', 'UTC-9', 'UTC-8', 'UTC-7', 'UTC-6', 'UTC-5', 'UTC-4',
-  'UTC-3', 'UTC-2', 'UTC-1', 'UTC+0', 'UTC+1', 'UTC+2', 'UTC+3', 'UTC+4',
-  'UTC+5', 'UTC+6', 'UTC+7', 'UTC+8', 'UTC+9', 'UTC+10', 'UTC+11', 'UTC+12'
-]
-const currencies = ['USD','EUR','GBP','AUD','BRL','CAD','CNY','CZK','DKK','HKD','HUF','INR']
-
 const resetForm = () => fetchAccountData()
 
 const changeAvatar = (file) => {
@@ -48,6 +46,13 @@ const changeAvatar = (file) => {
 
 const resetAvatar = () => {
   accountDataLocal.value.avatarImg = avatar1
+}
+
+const fetchSelectChoices = async () => {
+  currencies.value = await fetchChoices('currency')
+  languages.value = await fetchChoices('language')
+  timezones.value = await fetchChoices('timezone')
+  countries.value = await fetchChoices('country')
 }
 
 const fetchAccountData = async () => {
@@ -74,8 +79,10 @@ const fetchAccountData = async () => {
   }
 }
 
-onMounted(() => fetchAccountData())
-
+onMounted(async () => {
+  await fetchSelectChoices()  // carrega selects primeiro
+  await fetchAccountData()    // depois carrega os dados do usuário
+})
 
 const handleSaveChanges = async () => {
   try {
@@ -174,18 +181,41 @@ const handleSaveChanges = async () => {
               <VCol cols="12" md="6">
                 <VTextField v-model="accountDataLocal.zip_code" label="Zip Code"/>
               </VCol>
-              <VCol cols="12" md="6">
-                <VSelect v-model="accountDataLocal.country" label="Country" :items="['USA', 'Canada', 'UK', 'India', 'Australia']"/>
-              </VCol>
-              <VCol cols="12" md="6">
-                <VSelect v-model="accountDataLocal.language" label="Language" :items="['English', 'Spanish', 'Arabic', 'Hindi', 'Urdu']"/>
-              </VCol>
-              <VCol cols="12" md="6">
-                <VSelect v-model="accountDataLocal.timezone" label="Timezone" :items="timezones" :menu-props="{ maxHeight: 200 }"/>
-              </VCol>
-              <VCol cols="12" md="6">
-                <VSelect v-model="accountDataLocal.currency" label="Currency" :items="currencies" :menu-props="{ maxHeight: 200 }"/>
-              </VCol>
+<VSelect
+  v-model="accountDataLocal.currency"
+  label="Currency"
+  :items="currencies"
+  item-title="label"
+  item-value="value"
+  :menu-props="{ maxHeight: 200 }"
+/>
+
+<VSelect
+  v-model="accountDataLocal.language"
+  label="Language"
+  :items="languages"
+  item-title="label"
+  item-value="value"
+  :menu-props="{ maxHeight: 200 }"
+/>
+
+<VSelect
+  v-model="accountDataLocal.timezone"
+  label="Timezone"
+  :items="timezones"
+  item-title="label"
+  item-value="value"
+  :menu-props="{ maxHeight: 200 }"
+/>
+
+<VSelect
+  v-model="accountDataLocal.country"
+  label="Country"
+  :items="countries"
+  item-title="label"
+  item-value="value"
+  :menu-props="{ maxHeight: 200 }"
+/>
 
               <VCol cols="12" class="d-flex flex-wrap gap-4">
                 <VBtn color="primary" @click.prevent="handleSaveChanges">
