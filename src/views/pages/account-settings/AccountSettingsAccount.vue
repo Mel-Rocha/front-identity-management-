@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import avatar1 from '@images/avatars/avatar-1.png'
 import { fetchMe } from '@/services/userService'
-import { axiosInstance } from '@/services/auth'
+import { updateUser } from '@/services/userService'
 
 const refInputEl = ref()
 const error = ref('')
@@ -75,6 +75,25 @@ const fetchAccountData = async () => {
 }
 
 onMounted(() => fetchAccountData())
+
+
+const handleSaveChanges = async () => {
+  try {
+    // accountDataLocal.value já contém todos os campos do formulário
+    const payload = { ...accountDataLocal.value }
+
+    // Faz a requisição PUT para atualizar o usuário
+    const updatedData = await updateUser(payload)
+
+    // Atualiza o local state, se quiser
+    accountDataLocal.value = { ...updatedData }
+
+    console.log('Usuário atualizado com sucesso:', updatedData)
+  } catch (err) {
+    console.error('Erro ao atualizar usuário:', err)
+  }
+}
+
 </script>
 
 <template>
@@ -155,8 +174,9 @@ onMounted(() => fetchAccountData())
               </VCol>
 
               <VCol cols="12" class="d-flex flex-wrap gap-4">
-                <VBtn>Save changes</VBtn>
-                <VBtn color="secondary" variant="tonal" type="reset" @click.prevent="resetForm">Reset</VBtn>
+                <VBtn color="primary" @click.prevent="handleSaveChanges">
+  Save changes
+      </VBtn>
               </VCol>
             </VRow>
           </VForm>
