@@ -10,8 +10,8 @@ const isAccountDeactivated = ref(false)
 
 const accountDataLocal = ref({
   avatarImg: avatar1,
-  firstName: '',
-  lastName: '',
+  first_name: '',
+  last_name: '',
   email: '',
   org: '',
   phone: '',
@@ -55,8 +55,8 @@ const fetchAccountData = async () => {
     const data = await fetchMe() // agora não precisa passar token
     accountDataLocal.value = {
       avatarImg: data.avatarImg || avatar1,
-      firstName: data.firstName || '',
-      lastName: data.lastName || '',
+      firstName: data.first_name || '',
+      lastName: data.last_name || '',
       email: data.email || '',
       org: data.org || '',
       phone: data.phone || '',
@@ -79,20 +79,34 @@ onMounted(() => fetchAccountData())
 
 const handleSaveChanges = async () => {
   try {
-    // accountDataLocal.value já contém todos os campos do formulário
-    const payload = { ...accountDataLocal.value }
+    // Prepara o payload com os nomes corretos que o back espera
+    const payload = {
+      email: accountDataLocal.value.email,
+      first_name: accountDataLocal.value.first_name,
+      last_name: accountDataLocal.value.last_name,
+      language: accountDataLocal.value.language,
+      timezone: accountDataLocal.value.timezone,
+      currency: accountDataLocal.value.currency,
+      country: accountDataLocal.value.country,
+      organization: accountDataLocal.value.org,
+      address: accountDataLocal.value.address,
+      state: accountDataLocal.value.state,
+      zip_code: accountDataLocal.value.zip,
+      phone_number: accountDataLocal.value.phone
+    }
 
-    // Faz a requisição PUT para atualizar o usuário
-    const updatedData = await updateUser(payload)
+    // Faz a requisição de update
+    await updateUser(payload)
 
-    // Atualiza o local state, se quiser
-    accountDataLocal.value = { ...updatedData }
+    // Recarrega os dados do usuário para refletir alterações
+    await fetchAccountData()
 
-    console.log('Usuário atualizado com sucesso:', updatedData)
+    console.log('Usuário atualizado com sucesso')
   } catch (err) {
     console.error('Erro ao atualizar usuário:', err)
   }
 }
+
 
 </script>
 
