@@ -19,7 +19,7 @@ const error = ref('')
 const isPasswordVisible = ref(false)
 
 // Função de login
-const login = async () => {
+const handleLogin = async () => {
   error.value = ''
   try {
     const data = await loginService(form.value.email, form.value.password)
@@ -34,7 +34,7 @@ const login = async () => {
 }
 
 // Função de recuperação de senha
-const recoverPassword = async () => {
+const handleRecoverPassword = async () => {
   error.value = ''
   if (!recoverEmail.value) {
     error.value = 'Informe seu e-mail para recuperar a senha.'
@@ -86,7 +86,7 @@ const recoverPassword = async () => {
         </VCardText>
 
         <VCardText>
-          <VForm @submit.prevent="login">
+          <VForm @submit.prevent="handleLogin">
             <VRow>
               <!-- Email -->
               <VCol cols="12">
@@ -158,7 +158,7 @@ const recoverPassword = async () => {
           <div v-if="error" class="text-error">{{ error }}</div>
         </VCardText>
         <VCardActions>
-          <VBtn color="primary" @click="recoverPassword">Enviar</VBtn>
+          <VBtn color="primary" @click="handleRecoverPassword">Enviar</VBtn>
           <VBtn text @click="showRecoverEmail = false">Cancelar</VBtn>
         </VCardActions>
       </VCard>
