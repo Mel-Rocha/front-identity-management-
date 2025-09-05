@@ -24,5 +24,6 @@ export async function deactivateCurrentUser() {
 
 export async function fetchUsersList() {
   const { data } = await api.get('/users/users-list-service/')
+    console.log(data)
   return data
 }
