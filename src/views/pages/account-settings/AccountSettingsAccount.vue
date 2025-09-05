@@ -5,6 +5,7 @@ import { fetchMe } from '@/services/userService'
 import { updateUser } from '@/services/userService'
 import { fetchChoices } from '@/services/choicesService'
 import { deactivateCurrentUser } from '@/services/userService'
+import { useAuthStore } from "@/stores/auth";
 import router from "@/router/index.js";
 
 const refInputEl = ref()
@@ -132,6 +133,9 @@ const goToUserList = () => {
   router.push({ name: 'UserList' })
 }
 
+
+const auth = useAuthStore();
+
 </script>
 
 <template>
@@ -249,11 +253,9 @@ const goToUserList = () => {
       <VCard title="Deactivate Account">
         <VBtn color="error" @click="handleDeactivateUser">Deactivate Account</VBtn>
         <VCardText>
-          <VBtn
-  @click="$router.push({ name: 'UserList' })"
->
-  Listar Usuários
-</VBtn>
+ <VBtn v-if="auth.isSuperuser || auth.isStaff">
+      Listar usuários
+    </VBtn>
           <VCheckbox v-model="isAccountDeactivated" label="I confirm my account deactivation"/>
           <VBtn :disabled="!isAccountDeactivated" color="error" class="mt-3">Deactivate Account</VBtn>
         </VCardText>
