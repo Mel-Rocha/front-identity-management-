@@ -128,6 +128,10 @@ const handleDeactivateUser = async () => {
   }
 }
 
+const goToUserList = () => {
+  router.push({ name: 'UserList' })
+}
+
 </script>
 
 <template>
@@ -245,6 +249,11 @@ const handleDeactivateUser = async () => {
       <VCard title="Deactivate Account">
         <VBtn color="error" @click="handleDeactivateUser">Deactivate Account</VBtn>
         <VCardText>
+          <VBtn
+  @click="$router.push({ name: 'UserList' })"
+>
+  Listar Usuários
+</VBtn>
           <VCheckbox v-model="isAccountDeactivated" label="I confirm my account deactivation"/>
           <VBtn :disabled="!isAccountDeactivated" color="error" class="mt-3">Deactivate Account</VBtn>
         </VCardText>
