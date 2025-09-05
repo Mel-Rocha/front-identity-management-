@@ -4,6 +4,8 @@ import avatar1 from '@images/avatars/avatar-1.png'
 import { fetchMe } from '@/services/userService'
 import { updateUser } from '@/services/userService'
 import { fetchChoices } from '@/services/choicesService'
+import { deactivateCurrentUser } from '@/services/userService'
+import router from "@/router/index.js";
 
 const refInputEl = ref()
 const error = ref('')
@@ -114,6 +116,17 @@ const handleSaveChanges = async () => {
   }
 }
 
+
+const handleDeactivateUser = async () => {
+  try {
+    await deactivateCurrentUser()
+    // após desativar, redireciona ou limpa token
+    localStorage.removeItem('token')
+    router.push({ name: 'Login' })
+  } catch (err) {
+    console.error('Falha ao desativar conta:', err)
+  }
+}
 
 </script>
 
@@ -230,6 +243,7 @@ const handleSaveChanges = async () => {
 
     <VCol cols="12">
       <VCard title="Deactivate Account">
+        <VBtn color="error" @click="handleDeactivateUser">Deactivate Account</VBtn>
         <VCardText>
           <VCheckbox v-model="isAccountDeactivated" label="I confirm my account deactivation"/>
           <VBtn :disabled="!isAccountDeactivated" color="error" class="mt-3">Deactivate Account</VBtn>

@@ -11,3 +11,13 @@ export async function updateUser(payload) {
   const { data } = await api.put('/users/user-update-service/', payload)
   return data
 }
+
+export async function deactivateCurrentUser() {
+  try {
+    const response = await api.delete('/users/user-inactivate-service/')
+    return response.data
+  } catch (err) {
+    console.error('Erro ao desativar usuário:', err)
+    throw err
+  }
+}
