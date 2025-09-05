@@ -13,11 +13,11 @@ const accountDataLocal = ref({
   first_name: '',
   last_name: '',
   email: '',
-  org: '',
-  phone: '',
+  organization: '',
+  phone_number: '',
   address: '',
   state: '',
-  zip: '',
+  zip_code: '',
   country: '',
   language: '',
   timezone: 'UTC+0', // padrão UTC+0
@@ -55,14 +55,14 @@ const fetchAccountData = async () => {
     const data = await fetchMe() // agora não precisa passar token
     accountDataLocal.value = {
       avatarImg: data.avatarImg || avatar1,
-      firstName: data.first_name || '',
-      lastName: data.last_name || '',
+      first_name: data.first_name || '',
+      last_name: data.last_name || '',
       email: data.email || '',
-      org: data.org || '',
-      phone: data.phone || '',
+      organization: data.organization || '',
+      phone_number: data.phone_number || '',
       address: data.address || '',
       state: data.state || '',
-      zip: data.zip || '',
+      zip_code: data.zip_code || '',
       country: data.country || '',
       language: data.language || '',
       timezone: data.timezone || 'UTC+0',
@@ -88,11 +88,11 @@ const handleSaveChanges = async () => {
       timezone: accountDataLocal.value.timezone,
       currency: accountDataLocal.value.currency,
       country: accountDataLocal.value.country,
-      organization: accountDataLocal.value.org,
+      organization: accountDataLocal.value.organization,
       address: accountDataLocal.value.address,
       state: accountDataLocal.value.state,
-      zip_code: accountDataLocal.value.zip,
-      phone_number: accountDataLocal.value.phone
+      zip_code: accountDataLocal.value.zip_code,
+      phone_number: accountDataLocal.value.phone_number
     }
 
     // Faz a requisição de update
@@ -151,19 +151,19 @@ const handleSaveChanges = async () => {
           <VForm class="mt-6">
             <VRow>
               <VCol md="6" cols="12">
-                <VTextField v-model="accountDataLocal.firstName" placeholder="John" label="First Name"/>
+                <VTextField v-model="accountDataLocal.first_name" placeholder="John" label="First Name"/>
               </VCol>
               <VCol md="6" cols="12">
-                <VTextField v-model="accountDataLocal.lastName" placeholder="Doe" label="Last Name"/>
+                <VTextField v-model="accountDataLocal.last_name" placeholder="Doe" label="Last Name"/>
               </VCol>
               <VCol cols="12" md="6">
                 <VTextField v-model="accountDataLocal.email" label="E-mail" type="email"/>
               </VCol>
               <VCol cols="12" md="6">
-                <VTextField v-model="accountDataLocal.org" label="Organization"/>
+                <VTextField v-model="accountDataLocal.organization" label="Organization"/>
               </VCol>
               <VCol cols="12" md="6">
-                <VTextField v-model="accountDataLocal.phone" label="Phone Number"/>
+                <VTextField v-model="accountDataLocal.phone_number" label="Phone Number"/>
               </VCol>
               <VCol cols="12" md="6">
                 <VTextField v-model="accountDataLocal.address" label="Address"/>
@@ -172,7 +172,7 @@ const handleSaveChanges = async () => {
                 <VTextField v-model="accountDataLocal.state" label="State"/>
               </VCol>
               <VCol cols="12" md="6">
-                <VTextField v-model="accountDataLocal.zip" label="Zip Code"/>
+                <VTextField v-model="accountDataLocal.zip_code" label="Zip Code"/>
               </VCol>
               <VCol cols="12" md="6">
                 <VSelect v-model="accountDataLocal.country" label="Country" :items="['USA', 'Canada', 'UK', 'India', 'Australia']"/>
