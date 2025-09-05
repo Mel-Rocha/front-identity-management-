@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import avatar1 from '@images/avatars/avatar-1.png'
 import { fetchMe } from '@/services/userService'
+import { axiosInstance } from '@/services/auth'
 
 const refInputEl = ref()
 const error = ref('')
@@ -51,9 +52,7 @@ const resetAvatar = () => {
 
 const fetchAccountData = async () => {
   try {
-    const token = localStorage.getItem('token') // token armazenado após login
-    if (!token) throw new Error('Token não encontrado')
-    const data = await fetchMe(token)
+    const data = await fetchMe() // agora não precisa passar token
     accountDataLocal.value = {
       avatarImg: data.avatarImg || avatar1,
       firstName: data.firstName || '',

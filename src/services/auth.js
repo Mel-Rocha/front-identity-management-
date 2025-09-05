@@ -1,20 +1,43 @@
 // src/services/auth.js
 import axios from 'axios';
-
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+// Armazenamento do token
+export const setToken = (token) => localStorage.setItem('token', token);
+export const getToken = () => localStorage.getItem('token');
+export const removeToken = () => localStorage.removeItem('token');
+
+// Axios instance
+// Axios instance
+export const axiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+});
+
+// Interceptor para enviar token em todas requisições
+axiosInstance.interceptors.request.use(config => {
+  const token = getToken();
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+// Funções
 export async function login(email, password) {
-  const response = await axios.post(`${API_BASE_URL}/users/login-service/`, { email, password });
-  return response.data; // aqui você pode devolver o token, usuário, etc.
+  const { data } = await axiosInstance.post('/users/login-service/', { email, password });
+  if (data?.token) setToken(data.token); // armazena o token
+  return data;
 }
 
-export const recoverPassword = async (email) => {
-  const { data } = await axios.post(`${API_BASE_URL}/users/recover_password-service/`, { email })
-  return data
+export async function recoverPassword(email) {
+  const { data } = await axiosInstance.post('/users/recover_password-service/', { email });
+  return data;
 }
 
+export async function register(username, email, password) {
+  const { data } = await axiosInstance.post('/users/signup-service/', { username, email, password });
+  return data;
+}
 
-export const register = async (username, email, password) => {
-  const res = await axios.post(`${API_BASE_URL}/users/signup-service/`, { username, email, password })
-  return res.data
+// Função de logout
+export function logout() {
+  removeToken();
 }

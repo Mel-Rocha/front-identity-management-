@@ -6,8 +6,7 @@ import Account from '@/views/pages/account-settings/AccountSettingsAccount.vue'
 
 export const routes = [
   { path: '/login', name: 'Login', component: Login },
-    { path: '/register', name: 'Register', component: Register },
-    { path: '/account-settings', name: 'AccountSettings', component: Account },
-  { path: '/dashboard', name: 'Dashboard', component: Dashboard },
-  // você pode adicionar mais rotas: registro, perfil, etc.
+  { path: '/register', name: 'Register', component: Register },
+  { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { requiresAuth: true } },
+  { path: '/account-setting', name: 'AccountSettings', component: Account, meta: { requiresAuth: true } },
 ]
