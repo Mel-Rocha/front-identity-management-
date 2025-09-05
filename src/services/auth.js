@@ -19,13 +19,10 @@ axiosInstance.interceptors.request.use(config => {
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
-const token = localStorage.getItem('token');
-console.log('TOKEN SALVO:', token); // [DEBUG]
 
 // Funções
 export async function login(email, password) {
   const { data } = await axios.post(`${API_BASE_URL}/users/login-service/`, { email, password });
-  console.log(data);
   if (data?.access) setToken(data.access);
   return data;
 }

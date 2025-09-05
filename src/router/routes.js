@@ -9,11 +9,27 @@ export const routes = [
   { path: '/login', name: 'Login', component: Login },
   { path: '/register', name: 'Register', component: Register },
     {
-  path: '/users-list',
-  name: 'UsersList',
-    component: UserList,
-    meta: { requiresAuth: true },
-  },
-  { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { requiresAuth: true } },
-  { path: '/account-settings', name: 'AccountSettings', component: Account, meta: { requiresAuth: true } },
+  path: '/',
+  component: () => import('@/layouts/default.vue'), // ou DefaultLayoutWithVerticalNav.vue
+  children: [
+    {
+      path: 'dashboard',
+      name: 'Dashboard',
+      component: () => import('@/pages/dashboard.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: 'account-settings',
+      name: 'AccountSettings',
+      component: () => import('@/views/pages/account-settings/AccountSettingsAccount.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: 'users-list',
+      name: 'UsersList',
+      component: () => import('@/views/pages/account-settings/UserList.vue'),
+      meta: { requiresAuth: true },
+    },
+  ],
+}
 ]
