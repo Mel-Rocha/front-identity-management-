@@ -1,35 +1,43 @@
-# vue
+# Vue 3 + Vite
 
-This template should help get you started developing with Vue 3 in Vite.
+Este template ajuda você a começar a desenvolver aplicações com **Vue 3** usando **Vite**.
 
-## Recommended IDE Setup
+---
 
-[VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) (and disable Vetur).
+## Configuração recomendada do IDE
 
-## Type Support for `.vue` Imports in TS
+Use o **[VS Code](https://code.visualstudio.com/)** com a extensão **Volar** (desative o Vetur caso esteja ativo).
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates.
+---
 
-However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can run `Volar: Switch TS Plugin on/off` from VS Code command palette.
+## Suporte a Tipos para `.vue` em TypeScript
 
-## Customize configuration
+Como o TypeScript não consegue lidar nativamente com as informações de tipos de componentes `.vue`, elas são tratadas como um tipo genérico de componente Vue por padrão. Na maioria dos casos, isso é suficiente, especialmente se você não precisa de validação avançada de props fora dos templates.
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+Se você quiser obter os tipos reais de props em `.vue` (por exemplo, ao usar chamadas manuais de `h(...)`), você pode alternar o plugin do Volar pelo **Command Palette** do VS Code:  
+`Volar: Switch TS Plugin on/off`.
 
-## Project Setup
+---
 
-```sh
+## Personalização da configuração
+
+Para detalhes de configuração do Vite, consulte a documentação oficial: [Vite Configuration Reference](https://vitejs.dev/config/).
+
+---
+
+## Configuração do projeto
+
+1. Instale as dependências:
+
+```bash
 npm install
 ```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
+2. Copie o template de variáveis de ambiente e preencha com os valores necessários:
+```bash
+cp env.example .env
 ```
 
-### Type-Check, Compile and Minify for Production
-
-```sh
+3. Build para produção (com verificação de tipos e minificação)
+```bash
 npm run build
 ```
