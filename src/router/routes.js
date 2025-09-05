@@ -9,8 +9,8 @@ export const routes = [
   { path: '/login', name: 'Login', component: Login },
   { path: '/register', name: 'Register', component: Register },
     {
-    path: '/users',
-    name: 'UserList',
+  path: '/users-list',
+  name: 'UsersList',
     component: UserList,
     meta: { requiresAuth: true },
   },

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import avatar1 from '@images/avatars/avatar-1.png'
-import { fetchMe } from '@/services/userService'
+import {fetchMe} from '@/services/userService'
 import { updateUser } from '@/services/userService'
 import { fetchChoices } from '@/services/choicesService'
 import { deactivateCurrentUser } from '@/services/userService'
@@ -83,6 +83,7 @@ const fetchAccountData = async () => {
 }
 
 onMounted(async () => {
+  await auth.loadUser(); // carrega o usuário
   await fetchSelectChoices()  // carrega selects primeiro
   await fetchAccountData()    // depois carrega os dados do usuário
 })
@@ -129,10 +130,9 @@ const handleDeactivateUser = async () => {
   }
 }
 
-const goToUserList = () => {
-  router.push({ name: 'UserList' })
-}
-
+const goToUsersList = () => {
+  router.push({ name: 'UsersList' });
+};
 
 const auth = useAuthStore();
 
@@ -253,9 +253,12 @@ const auth = useAuthStore();
       <VCard title="Deactivate Account">
         <VBtn color="error" @click="handleDeactivateUser">Deactivate Account</VBtn>
         <VCardText>
- <VBtn v-if="auth.isSuperuser || auth.isStaff">
-      Listar usuários
-    </VBtn>
+<VBtn
+  v-if="auth.user && (auth.isSuperuser || auth.isStaff)"
+  @click="goToUsersList"
+>
+  Listar usuários
+</VBtn>
           <VCheckbox v-model="isAccountDeactivated" label="I confirm my account deactivation"/>
           <VBtn :disabled="!isAccountDeactivated" color="error" class="mt-3">Deactivate Account</VBtn>
         </VCardText>
