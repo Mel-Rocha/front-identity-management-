@@ -24,7 +24,7 @@ const handleLogin = async () => {
   try {
     const data = await loginService(form.value.email, form.value.password)
     // Armazena token no localStorage
-    localStorage.setItem('token', data.token)
+    localStorage.setItem('token', data.access)
     // Redireciona para dashboard
     router.push({ name: 'Dashboard' })
   } catch (err) {

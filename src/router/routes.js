@@ -8,5 +8,5 @@ export const routes = [
   { path: '/login', name: 'Login', component: Login },
   { path: '/register', name: 'Register', component: Register },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { requiresAuth: true } },
-  { path: '/account-setting', name: 'AccountSettings', component: Account, meta: { requiresAuth: true } },
+  { path: '/account-settings', name: 'AccountSettings', component: Account, meta: { requiresAuth: true } },
 ]
