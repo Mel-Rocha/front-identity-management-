@@ -1,8 +1,14 @@
 <script setup>
 import AuthProvider from '@/views/pages/authentication/AuthProvider.vue'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { register as registerService } from '@/services/auth'  // <- usamos o service
+
 import logo from '@images/logo.svg?raw'
 import authV1BottomShape from '@images/svg/auth-v1-bottom-shape.svg?url'
 import authV1TopShape from '@images/svg/auth-v1-top-shape.svg?url'
+
+const router = useRouter()
 
 const form = ref({
   username: '',
@@ -12,7 +18,22 @@ const form = ref({
 })
 
 const isPasswordVisible = ref(false)
+const error = ref('')
+
+const register = async () => {
+  error.value = ''
+  try {
+    const data = await registerService(form.value.username, form.value.email, form.value.password)
+    console.log(data)
+    // Redireciona para login ou dashboard
+    router.push({ name: 'Login' })
+  } catch (err) {
+    error.value = err.response?.data?.message || 'Falha no registro'
+    console.error(err)
+  }
+}
 </script>
+
 
 <template>
   <div class="auth-wrapper d-flex align-center justify-center pa-4">
@@ -61,7 +82,7 @@ const isPasswordVisible = ref(false)
         </VCardText>
 
         <VCardText>
-          <VForm @submit.prevent="$router.push('/')">
+<VForm @submit.prevent="register">
             <VRow>
               <!-- Username -->
               <VCol cols="12">

@@ -1,103 +1,141 @@
 <script setup>
+import { ref, onMounted } from 'vue'
 import avatar1 from '@images/avatars/avatar-1.png'
-
-const accountData = {
-  avatarImg: avatar1,
-  firstName: 'john',
-  lastName: 'Doe',
-  email: 'johnDoe@example.com',
-  org: 'ThemeSelection',
-  phone: '+1 (917) 543-9876',
-  address: '123 Main St, New York, NY 10001',
-  state: 'New York',
-  zip: '10001',
-  country: 'USA',
-  language: 'English',
-  timezone: '(GMT-11:00) International Date Line West',
-  currency: 'USD',
-}
+import {fetchMe} from '@/services/userService'
+import { updateUser } from '@/services/userService'
+import { fetchChoices } from '@/services/choicesService'
+import { deactivateCurrentUser } from '@/services/userService'
+import { useAuthStore } from "@/stores/auth";
+import router from "@/router/index.js";
 
 const refInputEl = ref()
-const accountDataLocal = ref(structuredClone(accountData))
+const error = ref('')
 const isAccountDeactivated = ref(false)
 
-const resetForm = () => {
-  accountDataLocal.value = structuredClone(accountData)
-}
+const currencies = ref([])
+const languages = ref([])
+const timezones = ref([])
+const countries = ref([])
 
-const changeAvatar = file => {
-  const fileReader = new FileReader()
+const accountDataLocal = ref({
+  avatarImg: avatar1,
+  first_name: '',
+  last_name: '',
+  email: '',
+  organization: '',
+  phone_number: '',
+  address: '',
+  state: '',
+  zip_code: '',
+  country: '',
+  language: '',
+  timezone: 'UTC+0', // padrão UTC+0
+  currency: ''
+})
+
+const resetForm = () => fetchAccountData()
+
+const changeAvatar = (file) => {
   const { files } = file.target
   if (files && files.length) {
-    fileReader.readAsDataURL(files[0])
-    fileReader.onload = () => {
-      if (typeof fileReader.result === 'string')
-        accountDataLocal.value.avatarImg = fileReader.result
+    const reader = new FileReader()
+    reader.readAsDataURL(files[0])
+    reader.onload = () => {
+      if (typeof reader.result === 'string')
+        accountDataLocal.value.avatarImg = reader.result
     }
   }
 }
 
-// reset avatar image
 const resetAvatar = () => {
-  accountDataLocal.value.avatarImg = accountData.avatarImg
+  accountDataLocal.value.avatarImg = avatar1
 }
 
-const timezones = [
-  '(GMT-11:00) International Date Line West',
-  '(GMT-11:00) Midway Island',
-  '(GMT-10:00) Hawaii',
-  '(GMT-09:00) Alaska',
-  '(GMT-08:00) Pacific Time (US & Canada)',
-  '(GMT-08:00) Tijuana',
-  '(GMT-07:00) Arizona',
-  '(GMT-07:00) Chihuahua',
-  '(GMT-07:00) La Paz',
-  '(GMT-07:00) Mazatlan',
-  '(GMT-07:00) Mountain Time (US & Canada)',
-  '(GMT-06:00) Central America',
-  '(GMT-06:00) Central Time (US & Canada)',
-  '(GMT-06:00) Guadalajara',
-  '(GMT-06:00) Mexico City',
-  '(GMT-06:00) Monterrey',
-  '(GMT-06:00) Saskatchewan',
-  '(GMT-05:00) Bogota',
-  '(GMT-05:00) Eastern Time (US & Canada)',
-  '(GMT-05:00) Indiana (East)',
-  '(GMT-05:00) Lima',
-  '(GMT-05:00) Quito',
-  '(GMT-04:00) Atlantic Time (Canada)',
-  '(GMT-04:00) Caracas',
-  '(GMT-04:00) La Paz',
-  '(GMT-04:00) Santiago',
-  '(GMT-03:30) Newfoundland',
-  '(GMT-03:00) Brasilia',
-  '(GMT-03:00) Buenos Aires',
-  '(GMT-03:00) Georgetown',
-  '(GMT-03:00) Greenland',
-  '(GMT-02:00) Mid-Atlantic',
-  '(GMT-01:00) Azores',
-  '(GMT-01:00) Cape Verde Is.',
-  '(GMT+00:00) Casablanca',
-  '(GMT+00:00) Dublin',
-  '(GMT+00:00) Edinburgh',
-  '(GMT+00:00) Lisbon',
-  '(GMT+00:00) London',
-]
+const fetchSelectChoices = async () => {
+  currencies.value = await fetchChoices('currency')
+  languages.value = await fetchChoices('language')
+  timezones.value = await fetchChoices('timezone')
+  countries.value = await fetchChoices('country')
+}
 
-const currencies = [
-  'USD',
-  'EUR',
-  'GBP',
-  'AUD',
-  'BRL',
-  'CAD',
-  'CNY',
-  'CZK',
-  'DKK',
-  'HKD',
-  'HUF',
-  'INR',
-]
+const fetchAccountData = async () => {
+  try {
+    const data = await fetchMe() // agora não precisa passar token
+    accountDataLocal.value = {
+      avatarImg: data.avatarImg || avatar1,
+      first_name: data.first_name || '',
+      last_name: data.last_name || '',
+      email: data.email || '',
+      organization: data.organization || '',
+      phone_number: data.phone_number || '',
+      address: data.address || '',
+      state: data.state || '',
+      zip_code: data.zip_code || '',
+      country: data.country || '',
+      language: data.language || '',
+      timezone: data.timezone || 'UTC+0',
+      currency: data.currency || ''
+    }
+  } catch (err) {
+    error.value = 'Não foi possível carregar os dados do usuário.'
+    console.error(err)
+  }
+}
+
+onMounted(async () => {
+  await auth.loadUser(); // carrega o usuário
+  await fetchSelectChoices()  // carrega selects primeiro
+  await fetchAccountData()    // depois carrega os dados do usuário
+})
+
+const handleSaveChanges = async () => {
+  try {
+    // Prepara o payload com os nomes corretos que o back espera
+    const payload = {
+      email: accountDataLocal.value.email,
+      first_name: accountDataLocal.value.first_name,
+      last_name: accountDataLocal.value.last_name,
+      language: accountDataLocal.value.language,
+      timezone: accountDataLocal.value.timezone,
+      currency: accountDataLocal.value.currency,
+      country: accountDataLocal.value.country,
+      organization: accountDataLocal.value.organization,
+      address: accountDataLocal.value.address,
+      state: accountDataLocal.value.state,
+      zip_code: accountDataLocal.value.zip_code,
+      phone_number: accountDataLocal.value.phone_number
+    }
+
+    // Faz a requisição de update
+    await updateUser(payload)
+
+    // Recarrega os dados do usuário para refletir alterações
+    await fetchAccountData()
+
+    console.log('Usuário atualizado com sucesso')
+  } catch (err) {
+    console.error('Erro ao atualizar usuário:', err)
+  }
+}
+
+
+const handleDeactivateUser = async () => {
+  try {
+    await deactivateCurrentUser()
+    // após desativar, redireciona ou limpa token
+    localStorage.removeItem('token')
+    router.push({ name: 'Login' })
+  } catch (err) {
+    console.error('Falha ao desativar conta:', err)
+  }
+}
+
+const goToUsersList = () => {
+  router.push({ name: 'UsersList' });
+};
+
+const auth = useAuthStore();
+
 </script>
 
 <template>
@@ -105,229 +143,105 @@ const currencies = [
     <VCol cols="12">
       <VCard title="Account Details">
         <VCardText class="d-flex">
-          <!-- 👉 Avatar -->
           <VAvatar
             rounded="lg"
             size="100"
             class="me-6"
             :image="accountDataLocal.avatarImg"
           />
-
-          <!-- 👉 Upload Photo -->
           <form class="d-flex flex-column justify-center gap-5">
             <div class="d-flex flex-wrap gap-2">
-              <VBtn
-                color="primary"
-                @click="refInputEl?.click()"
-              >
-                <VIcon
-                  icon="bx-cloud-upload"
-                  class="d-sm-none"
-                />
+              <VBtn color="primary" @click="refInputEl?.click()">
+                <VIcon icon="bx-cloud-upload" class="d-sm-none"/>
                 <span class="d-none d-sm-block">Upload new photo</span>
               </VBtn>
 
               <input
                 ref="refInputEl"
                 type="file"
-                name="file"
                 accept=".jpeg,.png,.jpg,GIF"
                 hidden
                 @input="changeAvatar"
               >
 
-              <VBtn
-                type="reset"
-                color="error"
-                variant="tonal"
-                @click="resetAvatar"
-              >
+              <VBtn type="reset" color="error" variant="tonal" @click="resetAvatar">
                 <span class="d-none d-sm-block">Reset</span>
-                <VIcon
-                  icon="bx-refresh"
-                  class="d-sm-none"
-                />
+                <VIcon icon="bx-refresh" class="d-sm-none"/>
               </VBtn>
             </div>
-
-            <p class="text-body-1 mb-0">
-              Allowed JPG, GIF or PNG. Max size of 800K
-            </p>
+            <p class="text-body-1 mb-0">Allowed JPG, GIF or PNG. Max size of 800K</p>
           </form>
         </VCardText>
 
         <VDivider />
 
         <VCardText>
-          <!-- 👉 Form -->
           <VForm class="mt-6">
             <VRow>
-              <!-- 👉 First Name -->
-              <VCol
-                md="6"
-                cols="12"
-              >
-                <VTextField
-                  v-model="accountDataLocal.firstName"
-                  placeholder="John"
-                  label="First Name"
-                />
+              <VCol md="6" cols="12">
+                <VTextField v-model="accountDataLocal.first_name" placeholder="John" label="First Name"/>
               </VCol>
-
-              <!-- 👉 Last Name -->
-              <VCol
-                md="6"
-                cols="12"
-              >
-                <VTextField
-                  v-model="accountDataLocal.lastName"
-                  placeholder="Doe"
-                  label="Last Name"
-                />
+              <VCol md="6" cols="12">
+                <VTextField v-model="accountDataLocal.last_name" placeholder="Doe" label="Last Name"/>
               </VCol>
-
-              <!-- 👉 Email -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="accountDataLocal.email"
-                  label="E-mail"
-                  placeholder="johndoe@gmail.com"
-                  type="email"
-                />
+              <VCol cols="12" md="6">
+                <VTextField v-model="accountDataLocal.email" label="E-mail" type="email"/>
               </VCol>
-
-              <!-- 👉 Organization -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="accountDataLocal.org"
-                  label="Organization"
-                  placeholder="ThemeSelection"
-                />
+              <VCol cols="12" md="6">
+                <VTextField v-model="accountDataLocal.organization" label="Organization"/>
               </VCol>
-
-              <!-- 👉 Phone -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="accountDataLocal.phone"
-                  label="Phone Number"
-                  placeholder="+1 (917) 543-9876"
-                />
+              <VCol cols="12" md="6">
+                <VTextField v-model="accountDataLocal.phone_number" label="Phone Number"/>
               </VCol>
-
-              <!-- 👉 Address -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="accountDataLocal.address"
-                  label="Address"
-                  placeholder="123 Main St, New York, NY 10001"
-                />
+              <VCol cols="12" md="6">
+                <VTextField v-model="accountDataLocal.address" label="Address"/>
               </VCol>
-
-              <!-- 👉 State -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="accountDataLocal.state"
-                  label="State"
-                  placeholder="New York"
-                />
+              <VCol cols="12" md="6">
+                <VTextField v-model="accountDataLocal.state" label="State"/>
               </VCol>
-
-              <!-- 👉 Zip Code -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="accountDataLocal.zip"
-                  label="Zip Code"
-                  placeholder="10001"
-                />
+              <VCol cols="12" md="6">
+                <VTextField v-model="accountDataLocal.zip_code" label="Zip Code"/>
               </VCol>
+<VSelect
+  v-model="accountDataLocal.currency"
+  label="Currency"
+  :items="currencies"
+  item-title="label"
+  item-value="value"
+  :menu-props="{ maxHeight: 200 }"
+/>
 
-              <!-- 👉 Country -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VSelect
-                  v-model="accountDataLocal.country"
-                  label="Country"
-                  :items="['USA', 'Canada', 'UK', 'India', 'Australia']"
-                  placeholder="Select Country"
-                />
-              </VCol>
+<VSelect
+  v-model="accountDataLocal.language"
+  label="Language"
+  :items="languages"
+  item-title="label"
+  item-value="value"
+  :menu-props="{ maxHeight: 200 }"
+/>
 
-              <!-- 👉 Language -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VSelect
-                  v-model="accountDataLocal.language"
-                  label="Language"
-                  placeholder="Select Language"
-                  :items="['English', 'Spanish', 'Arabic', 'Hindi', 'Urdu']"
-                />
-              </VCol>
+<VSelect
+  v-model="accountDataLocal.timezone"
+  label="Timezone"
+  :items="timezones"
+  item-title="label"
+  item-value="value"
+  :menu-props="{ maxHeight: 200 }"
+/>
 
-              <!-- 👉 Timezone -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VSelect
-                  v-model="accountDataLocal.timezone"
-                  label="Timezone"
-                  placeholder="Select Timezone"
-                  :items="timezones"
-                  :menu-props="{ maxHeight: 200 }"
-                />
-              </VCol>
+<VSelect
+  v-model="accountDataLocal.country"
+  label="Country"
+  :items="countries"
+  item-title="label"
+  item-value="value"
+  :menu-props="{ maxHeight: 200 }"
+/>
 
-              <!-- 👉 Currency -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VSelect
-                  v-model="accountDataLocal.currency"
-                  label="Currency"
-                  placeholder="Select Currency"
-                  :items="currencies"
-                  :menu-props="{ maxHeight: 200 }"
-                />
-              </VCol>
-
-              <!-- 👉 Form Actions -->
-              <VCol
-                cols="12"
-                class="d-flex flex-wrap gap-4"
-              >
-                <VBtn>Save changes</VBtn>
-
-                <VBtn
-                  color="secondary"
-                  variant="tonal"
-                  type="reset"
-                  @click.prevent="resetForm"
-                >
-                  Reset
-                </VBtn>
+              <VCol cols="12" class="d-flex flex-wrap gap-4">
+                <VBtn color="primary" @click.prevent="handleSaveChanges">
+  Save changes
+      </VBtn>
               </VCol>
             </VRow>
           </VForm>
@@ -336,23 +250,15 @@ const currencies = [
     </VCol>
 
     <VCol cols="12">
-      <!-- 👉 Deactivate Account -->
       <VCard title="Deactivate Account">
+        <VBtn color="error" @click="handleDeactivateUser">Deactivate Account</VBtn>
         <VCardText>
-          <div>
-            <VCheckbox
-              v-model="isAccountDeactivated"
-              label="I confirm my account deactivation"
-            />
-          </div>
-
-          <VBtn
-            :disabled="!isAccountDeactivated"
-            color="error"
-            class="mt-3"
-          >
-            Deactivate Account
-          </VBtn>
+<VBtn
+  v-if="auth.user && (auth.isSuperuser || auth.isStaff)"
+  @click="goToUsersList"
+>
+  Listar usuários
+</VBtn>
         </VCardText>
       </VCard>
     </VCol>

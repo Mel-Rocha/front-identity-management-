@@ -1,0 +1,29 @@
+import api from './api'
+
+export async function fetchMe() {
+  const response = await api.get('/users/me/')
+  return response.data
+}
+
+
+export async function updateUser(payload) {
+  // payload: { email, first_name, last_name, phone_number, ... }
+  const { data } = await api.put('/users/user-update-service/', payload)
+  return data
+}
+
+export async function deactivateCurrentUser() {
+  try {
+    const response = await api.delete('/users/user-inactivate-service/')
+    return response.data
+  } catch (err) {
+    console.error('Erro ao desativar usuário:', err)
+    throw err
+  }
+}
+
+export async function fetchUsersList() {
+  const { data } = await api.get('/users/users-list-service/')
+    console.log(data)
+  return data
+}
